@@ -1,0 +1,114 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+install.packages("dplyr")
+```
+
+```{r}
+library(dplyr)
+library(stringr)
+```
+
+
+```{r}
+library(readr)
+Medio <- read_csv("~/DatosPrem/Medio.csv")
+X12_Junio <- read_csv("~/DatosPrem/12-Junio.csv")
+Primero <- read_csv("~/DatosPrem/Primero.csv")
+View(Primero)
+View(X12_Junio)
+View(Medio)
+```
+```{r}
+# Filtrar filas que contienen "Ilegible" en cualquiera de las columnas
+Medio_ilegible <- Medio %>%
+  filter(if_any(everything(), ~ str_detect(., "Ilegible")))
+
+X12_Junio_ilegible <- X12_Junio %>%
+  filter(if_any(everything(), ~ str_detect(., "Ilegible")))
+
+Primero_ilegible <- Primero %>%
+  filter(if_any(everything(), ~ str_detect(., "Ilegible")))
+
+# Mostrar las primeras filas de los resultados para verificar
+View(Medio_ilegible)
+View(X12_Junio_ilegible)
+View(Primero_ilegible)
+```
+
+```{r}
+# Columnas a conservar
+columnas_conservar <- c("PAN", "PRI", "PRD", "PVEM", "PT", "MC", "MORENA", 
+                        "PAN-PRI-PRD", "PAN-PRI", "PAN-PRD", "PRI-PRD", 
+                        "PVEM_PT_MORENA", "PVEM_PT", "PVEM_MORENA", "PT_MORENA")
+
+# Filtrar filas que contienen "Ilegible" en cualquiera de las columnas y seleccionar las columnas especificadas
+Medio_ilegible <- Medio %>%
+  filter(if_any(everything(), ~ str_detect(., "Ilegible"))) %>%
+  select(any_of(columnas_conservar))
+
+X12_Junio_ilegible <- X12_Junio %>%
+  filter(if_any(everything(), ~ str_detect(., "Ilegible"))) %>%
+  select(any_of(columnas_conservar))
+
+Primero_ilegible <- Primero %>%
+  filter(if_any(everything(), ~ str_detect(., "Ilegible"))) %>%
+  select(any_of(columnas_conservar))
+
+# Mostrar las primeras filas de los resultados para verificar
+View(Medio_ilegible)
+View(X12_Junio_ilegible)
+View(Primero_ilegible)
+```
+
+#Obtener la sumatoria de la columa de lista nominal
+```{r}
+# Cargar los datos
+X12_Junio <- read_csv("~/DatosPrem/12-Junio.csv")
+
+# Verificar y convertir la columna LISTA_NOMINAL a numérico
+X12_Junio <- X12_Junio %>%
+  mutate(LISTA_NOMINAL = as.numeric(LISTA_NOMINAL))
+
+# Aplicar la sumatoria de los datos de la columna LISTA_NOMINAL
+total_lista_nominal <- sum(X12_Junio$LISTA_NOMINAL, na.rm = TRUE)
+
+# Mostrar el resultado de la sumatoria
+total_lista_nominal
+```
+#Aplicar la sumatoria pero ahora los datos de la columna con dato ilegible
+```{r}
+# Filtrar filas que contienen "Ilegible" en cualquiera de las columnas
+X12_Junio_ilegible <- X12_Junio %>%
+  filter(if_any(everything(), ~ str_detect(., "Ilegible")))
+
+# Verificar y convertir la columna LISTA_NOMINAL a numérico
+X12_Junio_ilegible <- X12_Junio_ilegible %>%
+  mutate(LISTA_NOMINAL = as.numeric(LISTA_NOMINAL))
+
+# Aplicar la sumatoria de los datos de la columna LISTA_NOMINAL en los datos filtrados
+total_lista_nominal_ilegible <- sum(X12_Junio_ilegible$LISTA_NOMINAL, na.rm = TRUE)
+
+# Mostrar el resultado de la sumatoria
+total_lista_nominal_ilegible
+```
+#Aplicar la sumatoria pero ahora los datos de la columna con dato Sin dato
+```{r}
+# Filtrar filas que contienen "Sin dato" en cualquiera de las columnas
+X12_Junio_sin_dato <- X12_Junio %>%
+  filter(if_any(everything(), ~ str_detect(., "Sin dato")))
+
+# Verificar y convertir la columna LISTA_NOMINAL a numérico
+X12_Junio_sin_dato <- X12_Junio_sin_dato %>%
+  mutate(LISTA_NOMINAL = as.numeric(LISTA_NOMINAL))
+
+# Aplicar la sumatoria de los datos de la columna LISTA_NOMINAL en los datos filtrados
+total_lista_nominal_sin_dato <- sum(X12_Junio_sin_dato$LISTA_NOMINAL, na.rm = TRUE)
+
+# Mostrar el resultado de la sumatoria
+total_lista_nominal_sin_dato
+```
+
