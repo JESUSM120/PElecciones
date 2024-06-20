@@ -1,0 +1,89 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+#Instalar las librerias
+```{r}
+install.packages("ggplot2")
+```
+
+
+#Cargar librerias
+```{r}
+library(ggplot2)
+```
+
+```{r}
+library(readr)
+PRES_202419junio <- read_csv("~/PElecciones-main/PElecciones-main/DatosPrem/PRES_202419junio.csv")
+View(PRES_202419junio)
+```
+#Sumar los valores de la columna Total Boletas Sobrantes y Total personas que votaron.
+```{r}
+# Convertir las columnas a numérico
+PRES_202419junio$TOTAL_BOLETAS_SOBRANTES <- as.numeric(PRES_202419junio$TOTAL_BOLETAS_SOBRANTES)
+PRES_202419junio$TOTAL_PERSONAS_VOTARON <- as.numeric(PRES_202419junio$TOTAL_PERSONAS_VOTARON)
+
+# Calcular la suma de la columna TOTAL_BOLETAS_SOBRANTES
+suma_total_boletas_sobrantes <- sum(PRES_202419junio$TOTAL_BOLETAS_SOBRANTES, na.rm = TRUE)
+
+# Calcular la suma de la columna TOTAL_PERSONAS_VOTARON
+suma_total_personas_votaron <- sum(PRES_202419junio$TOTAL_PERSONAS_VOTARON, na.rm = TRUE)
+
+# Realizar la resta de ambas sumas
+resta_boletas_personas_votaron <- suma_total_personas_votaron - suma_total_boletas_sobrantes
+
+# Imprimir los resultados
+print(paste("Suma de TOTAL_BOLETAS_SOBRANTES:", suma_total_boletas_sobrantes))
+print(paste("Suma de TOTAL_PERSONAS_VOTARON:", suma_total_personas_votaron))
+print(paste("Resta de ambas sumas (TOTAL_PERSONAS_VOTARON - TOTAL_BOLETAS_SOBRANTES):", resta_boletas_personas_votaron))
+```
+#Resta por filas
+
+```{r}
+# Convertir las columnas a numérico
+PRES_202419junio$TOTAL_BOLETAS_SOBRANTES <- as.numeric(PRES_202419junio$TOTAL_BOLETAS_SOBRANTES)
+PRES_202419junio$TOTAL_PERSONAS_VOTARON <- as.numeric(PRES_202419junio$TOTAL_PERSONAS_VOTARON)
+
+# Crear una nueva columna con la diferencia entre TOTAL_PERSONAS_VOTARON y TOTAL_BOLETAS_SOBRANTES
+PRES_202419junio$DIFERENCIA_PERSONAS_VOTARON_BOLETAS_SOBRANTES <- PRES_202419junio$TOTAL_PERSONAS_VOTARON - PRES_202419junio$TOTAL_BOLETAS_SOBRANTES
+
+# Seleccionar solo las columnas deseadas
+PRES_202419junio_reducido <- PRES_202419junio[, c("CLAVE_CASILLA", "CLAVE_ACTA","TOTAL_BOLETAS_SOBRANTES","TOTAL_PERSONAS_VOTARON", "DIFERENCIA_PERSONAS_VOTARON_BOLETAS_SOBRANTES")]
+
+# Verificar las primeras filas del dataframe reducido
+head(PRES_202419junio_reducido)
+```
+
+```{r}
+
+# Convertir las columnas de interés a numérico
+columns_to_sum <- c("PAN", "PRI", "PRD", "PVEM", "PT", "MC", "MORENA", 
+                    "PAN-PRI-PRD", "PAN-PRI", "PAN-PRD", "PRI-PRD", 
+                    "PVEM_PT_MORENA", "PVEM_PT", "PVEM_MORENA", "PT_MORENA")
+
+# Convertir las columnas seleccionadas a numérico
+PRES_202419junio[columns_to_sum] <- lapply(PRES_202419junio[columns_to_sum], as.numeric)
+
+# Calcular la suma por columna y guardar en un dataframe
+sumas_por_columna <- sapply(PRES_202419junio[columns_to_sum], sum, na.rm = TRUE)
+
+# Convertir a dataframe para una mejor visualización
+sumas_por_columna_df <- data.frame(Partido = names(sumas_por_columna), Suma = sumas_por_columna)
+
+# Verificar el dataframe con las sumas
+print(sumas_por_columna_df)
+
+# Crear el histograma con barras de diferentes colores
+ggplot(sumas_por_columna_df, aes(x = Partido, y = Suma, fill = Partido)) +
+  geom_col() +
+  theme_minimal() +
+  labs(title = "Sumas de votos por partido",
+       x = "Partido",
+       y = "Suma de votos") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_manual(values = rainbow(length(sumas_por_columna_df$Partido)))
+
+```
+
